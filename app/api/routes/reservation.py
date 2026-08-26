@@ -124,6 +124,18 @@ def get_showtime_reservations(
     return service.get_showtime_reservations(showtime_id)
 
 
+# Public: Get list of reserved seat UUIDs for seat map display
+@router.get(
+    "/showtime/{showtime_id}/reserved-seats",
+    response_model=list[UUID]
+)
+def get_reserved_seat_ids(
+    showtime_id: UUID,
+    service: ReservationService = Depends(get_reservation_service),
+):
+    return service.get_reserved_seat_ids(showtime_id)
+
+
 # User + Admin
 # Service current user's reservation cancel karega
 @router.patch(

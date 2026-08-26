@@ -19,7 +19,10 @@ from app.api.schemas.user import (
 )
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/user",
+    tags=["user"]
+)
 
 
 def get_user_service(

@@ -1,0 +1,8 @@
+{
+  "/movies/[id]/page": "app/movies/[id]/page.js",
+  "/movies/page": "app/movies/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/book/[showtime_id]/page": "app/book/[showtime_id]/page.js",
+  "/login/page": "app/login/page.js",
+  "/admin/page": "app/admin/page.js"
+}

@@ -224,6 +224,15 @@ class ReservationService:
             showtime_id
         )
 
+    def get_reserved_seat_ids(
+        self,
+        showtime_id: UUID
+    ) -> list[UUID]:
+
+        return self.reservation_repository.get_reserved_seat_ids(
+            showtime_id
+        )
+
     # ==================================================
     # GET ALL RESERVATIONS
     # ==================================================

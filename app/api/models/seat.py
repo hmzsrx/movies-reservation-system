@@ -44,7 +44,8 @@ class Seat(Base):
 
     reservation_seats: Mapped[list["ReservationSeat"]] = relationship(
         "ReservationSeat",
-        back_populates="seat"
+        back_populates="seat",
+        cascade="all, delete-orphan"
     )
 
     __table_args__ = (

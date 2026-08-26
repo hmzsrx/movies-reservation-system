@@ -14,7 +14,8 @@ from app.api.models.screen import Screen
 from app.api.models.seat import Seat
 from app.api.models.showtime import Showtime
 from app.api.models.reservation import Reservation
-from app.api.models.reserve_seat import ReservationSeat  
+from app.api.models.reserve_seat import ReservationSeat 
+from app.api.models.payments import Payment 
 
 from app.api.core.config import settings                       
 

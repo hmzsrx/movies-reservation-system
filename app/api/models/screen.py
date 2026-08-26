@@ -40,5 +40,6 @@ class Screen(Base):
 
     showtimes: Mapped[list["Showtime"]] = relationship(
         "Showtime",
-        back_populates="screen"
+        back_populates="screen",
+        cascade="all, delete-orphan"
     )

@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String, Text, DateTime, ForeignKey
+from sqlalchemy import String, Text, DateTime, ForeignKey, Float
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -37,6 +37,12 @@ class Movie(Base):
         nullable=False
     )
 
+    price: Mapped[float | None] = mapped_column(
+        Float,
+        default=10.0,
+        nullable=True
+    )
+
     release_date: Mapped[datetime | None] = mapped_column(
         DateTime,
         nullable=True
@@ -55,8 +61,8 @@ class Movie(Base):
     )
 
     thumbnail_url: Mapped[str | None] = mapped_column(
-    String(500),
-    nullable=True
+        String(500),
+        nullable=True
     )
 
     generic: Mapped["Generic"] = relationship(
@@ -66,5 +72,10 @@ class Movie(Base):
 
     showtimes: Mapped[list["Showtime"]] = relationship(
         "Showtime",
-        back_populates="movie"
+        back_populates="movie",
+        cascade="all, delete-orphan"
     )
+
+    @property
+    def genre_name(self) -> str | None:
+        return self.generic.name if self.generic else "Action"

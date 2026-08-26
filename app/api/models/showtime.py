@@ -58,5 +58,6 @@ class Showtime(Base):
 
     reservations: Mapped[list["Reservation"]] = relationship(
         "Reservation",
-        back_populates="showtime"
+        back_populates="showtime",
+        cascade="all, delete-orphan"
     )

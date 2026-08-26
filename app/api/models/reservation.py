@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from app.api.models.user import User
     from app.api.models.showtime import Showtime
     from app.api.models.reserve_seat import ReservationSeat
+    from app.api.models.payments import Payment
 
 
 class Reservation(Base):
@@ -61,5 +62,12 @@ class Reservation(Base):
     reservation_seats: Mapped[list["ReservationSeat"]] = relationship(
         "ReservationSeat",
         back_populates="reservation",
+        cascade="all, delete-orphan"
+    )
+
+    payment: Mapped["Payment | None"] = relationship(
+        "Payment",
+        back_populates="reservation",
+        uselist=False,
         cascade="all, delete-orphan"
     )

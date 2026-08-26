@@ -67,7 +67,8 @@ class AuthService:
         return {"message": "OTP sent to email successfully."}
 
     def login(self, data: LoginRequest):
-        user = self.user_repository.find_by_email(data.email)
+        email = data.email.strip().lower()
+        user = self.user_repository.find_by_email(email)
 
         if user is None:
             raise HTTPException(
