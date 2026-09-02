@@ -77,12 +77,12 @@ export default function Movies() {
     setEditingMovie(movie);
     setEditFile(null);
     setEditForm({
-      title: movie.title || "",
-      description: movie.description || "",
-      duration_minutes: movie.duration_minutes || 120,
-      price: movie.price || 10.0,
-      genre_name: movie.genre_name || "Action",
-      thumbnail_url: movie.thumbnail_url || ""
+      title: (movie.title as string) || "",
+      description: (movie.description as string) || "",
+      duration_minutes: (movie.duration_minutes as number) || 120,
+      price: (movie.price as number) || 10.0,
+      genre_name: (movie.genre_name as string) || "Action",
+      thumbnail_url: (movie.thumbnail_url as string) || ""
     });
   };
 
