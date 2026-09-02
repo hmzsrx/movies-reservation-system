@@ -2,16 +2,17 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import Link from "next/link";
+import Image from "next/image";
 import { Clock, Star, Film, DollarSign, Pencil, Trash2, X, Save, Search, User } from "lucide-react";
 
 export default function Movies() {
-  const [movies, setMovies] = useState<any[]>([]);
+  const [movies, setMovies] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [userRole, setUserRole] = useState<string | null>(null);
 
   // Edit State
-  const [editingMovie, setEditingMovie] = useState<any>(null);
+  const [editingMovie, setEditingMovie] = useState<Record<string, unknown> | null>(null);
   const [editLoading, setEditLoading] = useState(false);
   const [editFile, setEditFile] = useState<File | null>(null);
   const [editForm, setEditForm] = useState<{
@@ -66,12 +67,13 @@ export default function Movies() {
     try {
       await api.delete(`/movie/${id}`);
       fetchMovies();
-    } catch (err: any) {
-      alert(err.response?.data?.detail || err.message || "Failed to delete movie");
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { detail?: string } }; message?: string };
+      alert(e.response?.data?.detail || e.message || "Failed to delete movie");
     }
   };
 
-  const openEditModal = (movie: any) => {
+  const openEditModal = (movie: Record<string, unknown>) => {
     setEditingMovie(movie);
     setEditFile(null);
     setEditForm({
@@ -102,11 +104,12 @@ export default function Movies() {
       setEditingMovie(null);
       setEditFile(null);
       fetchMovies();
-    } catch (err: any) {
-      const detail = err.response?.data?.detail;
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { detail?: unknown } }; message?: string };
+      const detail = e.response?.data?.detail;
       if (typeof detail === "string") alert(detail);
-      else if (Array.isArray(detail)) alert(detail.map((d: any) => `${d.loc?.[d.loc.length - 1]}: ${d.msg}`).join(", "));
-      else alert(err.message || "Failed to update movie");
+      else if (Array.isArray(detail)) alert((detail as { loc?: string[]; msg: string }[]).map((d) => `${d.loc?.[d.loc.length - 1]}: ${d.msg}`).join(", "));
+      else alert(e.message || "Failed to update movie");
     } finally {
       setEditLoading(false);
     }
@@ -157,11 +160,11 @@ export default function Movies() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {movies.filter(m => m.title.toLowerCase().includes(searchQuery.toLowerCase()) || (m.genre_name && m.genre_name.toLowerCase().includes(searchQuery.toLowerCase()))).map((movie: any) => (
+            {movies.filter(m => (m.title as string).toLowerCase().includes(searchQuery.toLowerCase()) || (m.genre_name && (m.genre_name as string).toLowerCase().includes(searchQuery.toLowerCase()))).map((movie) => (
               <div key={movie.id} className="glass-panel rounded-xl overflow-hidden group hover:scale-[1.02] transition-transform duration-300 border border-zinc-800 flex flex-col">
                 <div className="h-64 bg-zinc-800 relative">
                   {movie.thumbnail_url ? (
-                    <img src={movie.thumbnail_url} alt={movie.title} className="w-full h-full object-cover" />
+                    <Image src={movie.thumbnail_url as string} alt={movie.title as string} fill className="object-cover" unoptimized />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-zinc-600 font-semibold">No Image</div>
                   )}
@@ -169,7 +172,7 @@ export default function Movies() {
                     <Star size={12} className="text-yellow-400" /> {movie.rating || 'N/A'}
                   </div>
                   <div className="absolute bottom-2 left-2 bg-emerald-600/90 text-white backdrop-blur text-xs font-bold px-2.5 py-1 rounded flex items-center gap-0.5 shadow">
-                    <DollarSign size={12} /> {movie.price ? movie.price.toFixed(2) : "10.00"}
+                    <DollarSign size={12} /> {movie.price ? (movie.price as number).toFixed(2) : "10.00"}
                   </div>
                   
                   
@@ -255,8 +258,8 @@ export default function Movies() {
               <div>
                 <label className="block text-sm font-medium text-zinc-400 mb-1">Upload New Image</label>
                 {(editForm.thumbnail_url || editFile) && (
-                  <div className="mb-2 rounded-lg overflow-hidden h-20 w-20 bg-zinc-800 border border-zinc-700">
-                    <img src={editFile ? URL.createObjectURL(editFile) : editForm.thumbnail_url} alt="Preview" className="w-full h-full object-cover" />
+                  <div className="mb-2 rounded-lg overflow-hidden h-20 w-20 bg-zinc-800 border border-zinc-700 relative">
+                    <Image src={editFile ? URL.createObjectURL(editFile) : editForm.thumbnail_url} alt="Preview" fill className="object-cover" unoptimized />
                   </div>
                 )}
                 <input type="file" accept="image/*" onChange={(e) => setEditFile(e.target.files ? e.target.files[0] : null)} className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-zinc-300 text-sm" />

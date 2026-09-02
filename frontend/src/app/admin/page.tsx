@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import api from "@/lib/api";
 import { Film, Plus, Calendar, Shield, Trash2, CheckCircle, Image as ImageIcon, Tag, DollarSign, Pencil, X, Save, Monitor, Armchair, BarChart3 } from "lucide-react";
 import ScreensTab from "@/components/admin/ScreensTab";
@@ -11,9 +12,9 @@ import ReportsTab from "@/components/admin/ReportsTab";
 type TabType = "movies" | "add-movie" | "add-showtime" | "screens" | "seats" | "genres" | "reports";
 
 export default function AdminDashboard() {
-  const [movies, setMovies] = useState<any[]>([]);
-  const [screens, setScreens] = useState<any[]>([]);
-  const [genres, setGenres] = useState<any[]>([]);
+  const [movies, setMovies] = useState<Record<string, unknown>[]>([]);
+  const [screens, setScreens] = useState<Record<string, unknown>[]>([]);
+  const [genres, setGenres] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>("movies");
 
@@ -38,7 +39,7 @@ export default function AdminDashboard() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Edit Modal State
-  const [editingMovie, setEditingMovie] = useState<any | null>(null);
+  const [editingMovie, setEditingMovie] = useState<Record<string, unknown> | null>(null);
   const [editForm, setEditForm] = useState<{
     title: string;
     description: string;
@@ -70,7 +71,7 @@ export default function AdminDashboard() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [moviesRes, screensRes, genresRes] = await Promise.all([
         api.get("/movie/").catch(() => ({ data: [] })),
@@ -93,7 +94,7 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
@@ -109,7 +110,7 @@ export default function AdminDashboard() {
     }).catch(() => {
       router.push("/login");
     });
-  }, []);
+  }, [router, fetchData]);
 
   const handleCreateMovie = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,11 +143,12 @@ export default function AdminDashboard() {
       setSelectedFile(null);
       fetchData();
       setActiveTab("movies");
-    } catch (err: any) {
-      const detail = err.response?.data?.detail;
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { detail?: unknown } }; message?: string };
+      const detail = e.response?.data?.detail;
       if (typeof detail === "string") setError(detail);
-      else if (Array.isArray(detail)) setError(detail.map((d: any) => `${d.loc?.[d.loc.length - 1] || 'Field'}: ${d.msg}`).join(", "));
-      else setError(err.message || "Failed to create movie");
+      else if (Array.isArray(detail)) setError(detail.map((d: { loc?: string[]; msg: string }) => `${d.loc?.[d.loc.length - 1] || 'Field'}: ${d.msg}`).join(", "));
+      else setError(e.message || "Failed to create movie");
     }
   };
 
@@ -155,12 +157,13 @@ export default function AdminDashboard() {
     try {
       await api.delete(`/movie/${movieId}`);
       fetchData();
-    } catch (err: any) {
-      alert(err.response?.data?.detail || "Failed to delete movie");
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { detail?: string } } };
+      alert(e.response?.data?.detail || "Failed to delete movie");
     }
   };
 
-  const openEditModal = (movie: any) => {
+  const openEditModal = (movie: Record<string, unknown>) => {
     setEditingMovie(movie);
     setEditFile(null);
     setEditForm({
@@ -192,11 +195,12 @@ export default function AdminDashboard() {
       setEditingMovie(null);
       setEditFile(null);
       fetchData();
-    } catch (err: any) {
-      const detail = err.response?.data?.detail;
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { detail?: unknown } }; message?: string };
+      const detail = e.response?.data?.detail;
       if (typeof detail === "string") alert(detail);
-      else if (Array.isArray(detail)) alert(detail.map((d: any) => `${d.loc?.[d.loc.length - 1]}: ${d.msg}`).join(", "));
-      else alert(err.message || "Failed to update movie");
+      else if (Array.isArray(detail)) alert(detail.map((d: { loc?: string[]; msg: string }) => `${d.loc?.[d.loc.length - 1]}: ${d.msg}`).join(", "));
+      else alert(e.message || "Failed to update movie");
     } finally {
       setEditLoading(false);
     }
@@ -218,11 +222,12 @@ export default function AdminDashboard() {
       });
       setMessage("Showtime scheduled successfully!");
       setActiveTab("movies");
-    } catch (err: any) {
-      const detail = err.response?.data?.detail;
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { detail?: unknown } }; message?: string };
+      const detail = e.response?.data?.detail;
       if (typeof detail === "string") setError(detail);
-      else if (Array.isArray(detail)) setError(detail.map((d: any) => `${d.loc?.[d.loc.length - 1] || 'Field'}: ${d.msg}`).join(", "));
-      else setError(err.message || "Failed to create showtime");
+      else if (Array.isArray(detail)) setError(detail.map((d: { loc?: string[]; msg: string }) => `${d.loc?.[d.loc.length - 1] || 'Field'}: ${d.msg}`).join(", "));
+      else setError(e.message || "Failed to create showtime");
     }
   };
 
@@ -269,32 +274,32 @@ export default function AdminDashboard() {
         {activeTab === "movies" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {movies.map((movie) => (
-              <div key={movie.id} className="glass-panel rounded-xl overflow-hidden border border-zinc-800 flex flex-col justify-between">
+              <div key={movie.id as string} className="glass-panel rounded-xl overflow-hidden border border-zinc-800 flex flex-col justify-between">
                 <div className="relative h-48 bg-zinc-900 overflow-hidden">
                   {movie.thumbnail_url ? (
-                    <img src={movie.thumbnail_url} alt={movie.title} className="w-full h-full object-cover" />
+                    <Image src={movie.thumbnail_url as string} alt={movie.title as string} fill className="object-cover" unoptimized />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-zinc-600 font-semibold">No Poster Image</div>
                   )}
                   <span className="absolute top-3 right-3 bg-primary text-white text-xs font-bold px-2.5 py-1 rounded-full uppercase shadow">
-                    {movie.genre_name || 'Action'}
+                    {(movie.genre_name as string) || 'Action'}
                   </span>
                   <span className="absolute bottom-3 left-3 bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-md shadow flex items-center gap-1">
-                    <DollarSign size={13} /> {movie.price ? movie.price.toFixed(2) : "10.00"} / ticket
+                    <DollarSign size={13} /> {movie.price ? (movie.price as number).toFixed(2) : "10.00"} / ticket
                   </span>
                 </div>
                 <div className="p-5 flex-1 flex flex-col justify-between">
                   <div>
-                    <h3 className="font-bold text-xl text-white mb-2">{movie.title}</h3>
-                    <p className="text-sm text-zinc-400 mb-4 line-clamp-2">{movie.description || 'No description'}</p>
+                    <h3 className="font-bold text-xl text-white mb-2">{movie.title as string}</h3>
+                    <p className="text-sm text-zinc-400 mb-4 line-clamp-2">{(movie.description as string) || 'No description'}</p>
                   </div>
                   <div className="flex justify-between items-center text-xs text-zinc-500 pt-4 border-t border-zinc-800/80">
-                    <span>{movie.duration_minutes} mins</span>
+                    <span>{movie.duration_minutes as number} mins</span>
                     <div className="flex items-center gap-2">
                       <button onClick={() => openEditModal(movie)} className="p-1.5 text-zinc-400 hover:text-blue-400 transition-colors flex items-center gap-1" title="Edit Movie">
                         <Pencil size={15} /> Edit
                       </button>
-                      <button onClick={() => handleDeleteMovie(movie.id)} className="p-1.5 text-zinc-500 hover:text-red-400 transition-colors flex items-center gap-1" title="Delete Movie">
+                      <button onClick={() => handleDeleteMovie(movie.id as string)} className="p-1.5 text-zinc-500 hover:text-red-400 transition-colors flex items-center gap-1" title="Delete Movie">
                         <Trash2 size={15} /> Delete
                       </button>
                     </div>
@@ -432,8 +437,8 @@ export default function AdminDashboard() {
               <div>
                 <label className="block text-sm font-medium text-zinc-400 mb-1">Upload New Image</label>
                 {(editForm.thumbnail_url || editFile) && (
-                  <div className="mb-2 rounded-lg overflow-hidden h-24 w-24 bg-zinc-900 border border-zinc-700">
-                    <img src={editFile ? URL.createObjectURL(editFile) : editForm.thumbnail_url} alt="Preview" className="w-full h-full object-cover" />
+                  <div className="mb-2 rounded-lg overflow-hidden h-24 w-24 bg-zinc-900 border border-zinc-700 relative">
+                    <Image src={editFile ? URL.createObjectURL(editFile) : editForm.thumbnail_url} alt="Preview" fill className="object-cover" unoptimized />
                   </div>
                 )}
                 <input type="file" accept="image/*" onChange={(e) => setEditFile(e.target.files ? e.target.files[0] : null)} className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 text-zinc-300 text-sm" />
