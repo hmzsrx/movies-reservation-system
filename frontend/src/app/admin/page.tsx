@@ -18,7 +18,6 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>("movies");
 
-  // Movie Form State
   const [movieForm, setMovieForm] = useState<{
     title: string;
     description: string;
@@ -38,7 +37,6 @@ export default function AdminDashboard() {
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  // Edit Modal State
   const [editingMovie, setEditingMovie] = useState<Record<string, unknown> | null>(null);
   const [editForm, setEditForm] = useState<{
     title: string;
@@ -60,7 +58,6 @@ export default function AdminDashboard() {
   const [editLoading, setEditLoading] = useState(false);
   const [editFile, setEditFile] = useState<File | null>(null);
 
-  // Showtime Form State
   const [showtimeForm, setShowtimeForm] = useState({
     movie_id: "",
     screen_id: "",
@@ -86,8 +83,8 @@ export default function AdminDashboard() {
       setGenres(fetchedGenres);
       setShowtimeForm(prev => ({
         ...prev,
-        movie_id: fetchedMovies.length > 0 ? fetchedMovies[0].id : "",
-        screen_id: fetchedScreens.length > 0 ? fetchedScreens[0].id : ""
+        movie_id: fetchedMovies.length > 0 ? (fetchedMovies[0].id as string) : "",
+        screen_id: fetchedScreens.length > 0 ? (fetchedScreens[0].id as string) : ""
       }));
     } catch (err) {
       console.error(err);
@@ -100,7 +97,6 @@ export default function AdminDashboard() {
     const token = localStorage.getItem("access_token");
     if (!token) { router.push("/login"); return; }
     
-    // Verify admin role
     api.get("/user/me").then(res => {
       if (res.data.role !== "admin") {
         router.push("/movies");
@@ -163,7 +159,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // After
   const openEditModal = (movie: Record<string, unknown>) => {
     setEditingMovie(movie);
     setEditFile(null);
@@ -212,7 +207,6 @@ export default function AdminDashboard() {
     setMessage(""); setError("");
     try {
       const selectedMovie = movies.find(m => m.id === showtimeForm.movie_id);
-      // After
       const duration = selectedMovie ? (selectedMovie.duration_minutes as number) : 120;
       const startTime = new Date(showtimeForm.start_time);
       const endTime = new Date(startTime.getTime() + duration * 60000);
@@ -250,7 +244,6 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-zinc-800 pb-6">
           <div className="flex items-center gap-3">
             <Shield className="text-primary" size={32} />
@@ -268,11 +261,9 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Messages */}
         {message && <div className="bg-green-500/20 border border-green-500 text-green-200 p-4 rounded-xl mb-6 flex items-center gap-2"><CheckCircle size={20} /> {message}</div>}
         {error && <div className="bg-red-500/20 border border-red-500 text-red-200 p-4 rounded-xl mb-6">{error}</div>}
 
-        {/* Tab: Movies */}
         {activeTab === "movies" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {movies.map((movie) => (
@@ -312,7 +303,6 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Tab: Add Movie */}
         {activeTab === "add-movie" && (
           <div className="glass-panel p-8 rounded-2xl max-w-2xl mx-auto border border-zinc-800">
             <h2 className="text-2xl font-bold mb-6 text-white flex items-center gap-2"><Film className="text-primary" /> Add New Movie & Ticket Price</h2>
@@ -362,7 +352,6 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Tab: Schedule Showtime */}
         {activeTab === "add-showtime" && (
           <div className="glass-panel p-8 rounded-2xl max-w-2xl mx-auto border border-zinc-800">
             <h2 className="text-2xl font-bold mb-6 text-white flex items-center gap-2"><Calendar className="text-primary" /> Schedule New Showtime</h2>
@@ -370,13 +359,21 @@ export default function AdminDashboard() {
               <div>
                 <label className="block text-sm font-medium text-zinc-400 mb-1">Select Movie</label>
                 <select value={showtimeForm.movie_id} onChange={(e) => setShowtimeForm({ ...showtimeForm, movie_id: e.target.value })} required className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary">
-                  {movies.map(m => <option key={m.id} value={m.id}>{m.title} (${m.price ? m.price.toFixed(2) : "10.00"})</option>)}
+                  {movies.map(m => (
+                    <option key={m.id as string} value={m.id as string}>
+                      {m.title as string} (${m.price ? (m.price as number).toFixed(2) : "10.00"})
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-zinc-400 mb-1">Select Screen</label>
                 <select value={showtimeForm.screen_id} onChange={(e) => setShowtimeForm({ ...showtimeForm, screen_id: e.target.value })} required className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary">
-                  {screens.map(s => <option key={s.id} value={s.id}>{s.name} ({s.capacity} seats)</option>)}
+                  {screens.map(s => (
+                    <option key={s.id as string} value={s.id as string}>
+                      {s.name as string} ({s.capacity as number} seats)
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>
@@ -390,20 +387,12 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Tab: Screens */}
         {activeTab === "screens" && <ScreensTab screens={screens} onRefresh={fetchData} />}
-
-        {/* Tab: Seats */}
         {activeTab === "seats" && <SeatsTab screens={screens} onRefresh={fetchData} />}
-
-        {/* Tab: Genres */}
         {activeTab === "genres" && <GenresTab genres={genres} onRefresh={fetchData} />}
-
-        {/* Tab: Reports */}
         {activeTab === "reports" && <ReportsTab />}
       </div>
 
-      {/* Edit Movie Modal */}
       {editingMovie && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="glass-panel border border-zinc-700 rounded-2xl p-8 w-full max-w-lg max-h-[90vh] overflow-y-auto">
