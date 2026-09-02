@@ -63,9 +63,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./frontend/Dockerfile
+          file: ./Dockerfile
           push: true
-          
           tags: hmzsrx/movie-reservation-backend:latest
 
   frontend:
