@@ -25,7 +25,7 @@ export default function Login() {
         window.location.href = "/movies";
       }
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Login failed");
+      setError(err.response?.data?.detail || "Login failed Sucess");
     }
   };
 
