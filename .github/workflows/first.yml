@@ -65,6 +65,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          
           tags: ${{ secrets.DOCKERHUB_USERNAME || github.actor }}/movie-reservation-backend:latest
 
   frontend:
