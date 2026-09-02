@@ -63,8 +63,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
-          push: false
+          file: ./frontend/Dockerfile
+          push: true
           
           tags: hmzsrx/movie-reservation-backend:latest
 
@@ -106,6 +106,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./frontend
-          file: ./Dockerfile
-          push: false
+          file: ./frontend/Dockerfile
+          push: true
           tags: hmzsrx/movie-reservation-frontend:latest
