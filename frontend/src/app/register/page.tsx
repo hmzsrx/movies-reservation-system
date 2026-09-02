@@ -80,7 +80,7 @@ export default function Register() {
         ) : (
           <form onSubmit={handleVerifyOtp} className="space-y-4">
             <p className="text-sm text-zinc-400 text-center mb-4">
-              We've sent a 6-digit OTP to <strong className="text-white">{formData.email}</strong>
+              We&apos;ve sent a 6-digit OTP to <strong className="text-white">{formData.email}</strong>
             </p>
             <div>
               <label className="block text-sm font-medium text-zinc-400 mb-1">Enter OTP</label>
