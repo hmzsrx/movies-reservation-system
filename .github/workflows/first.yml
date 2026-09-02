@@ -65,7 +65,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/movie-reservation-backend:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME || github.actor }}/movie-reservation-backend:latest
 
   frontend:
     runs-on: ubuntu-latest
@@ -107,4 +107,4 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/movie-reservation-frontend:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME || github.actor }}/movie-reservation-frontend:latest
