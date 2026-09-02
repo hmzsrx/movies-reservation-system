@@ -177,7 +177,7 @@ export default function AdminDashboard() {
       thumbnail_url: (movie.thumbnail_url as string) || ""
     });
   };
-  
+
   const handleUpdateMovie = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingMovie) return;
@@ -212,7 +212,8 @@ export default function AdminDashboard() {
     setMessage(""); setError("");
     try {
       const selectedMovie = movies.find(m => m.id === showtimeForm.movie_id);
-      const duration = selectedMovie ? selectedMovie.duration_minutes : 120;
+      // After
+      const duration = selectedMovie ? (selectedMovie.duration_minutes as number) : 120;
       const startTime = new Date(showtimeForm.start_time);
       const endTime = new Date(startTime.getTime() + duration * 60000);
       await api.post("/showtime/", {
