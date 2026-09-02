@@ -1,8 +1,13 @@
 {
-  "/movies/[id]/page": "app/movies/[id]/page.js",
-  "/movies/page": "app/movies/page.js",
-  "/profile/page": "app/profile/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/admin/page": "app/admin/page.js",
   "/book/[showtime_id]/page": "app/book/[showtime_id]/page.js",
   "/login/page": "app/login/page.js",
-  "/admin/page": "app/admin/page.js"
+  "/movies/[id]/page": "app/movies/[id]/page.js",
+  "/movies/page": "app/movies/page.js",
+  "/page": "app/page.js",
+  "/payment/success/page": "app/payment/success/page.js",
+  "/payment/cancel/page": "app/payment/cancel/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/register/page": "app/register/page.js"
 }

@@ -5,14 +5,26 @@ import Link from "next/link";
 import Image from "next/image";
 import { Clock, Star, Film, DollarSign, Pencil, Trash2, X, Save, Search, User } from "lucide-react";
 
+interface Movie {
+  id: string;
+  title: string;
+  description: string;
+  duration_minutes: number;
+  price: number;
+  genre_name?: string;
+  genre?: string;
+  thumbnail_url?: string;
+  rating?: number | string;
+}
+
 export default function Movies() {
-  const [movies, setMovies] = useState<Record<string, unknown>[]>([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [userRole, setUserRole] = useState<string | null>(null);
 
   // Edit State
-  const [editingMovie, setEditingMovie] = useState<Record<string, unknown> | null>(null);
+  const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
   const [editLoading, setEditLoading] = useState(false);
   const [editFile, setEditFile] = useState<File | null>(null);
   const [editForm, setEditForm] = useState<{
@@ -73,16 +85,16 @@ export default function Movies() {
     }
   };
 
-  const openEditModal = (movie: Record<string, unknown>) => {
+  const openEditModal = (movie: Movie) => {
     setEditingMovie(movie);
     setEditFile(null);
     setEditForm({
-      title: (movie.title as string) || "",
-      description: (movie.description as string) || "",
-      duration_minutes: (movie.duration_minutes as number) || 120,
-      price: (movie.price as number) || 10.0,
-      genre_name: (movie.genre_name as string) || "Action",
-      thumbnail_url: (movie.thumbnail_url as string) || ""
+      title: movie.title || "",
+      description: movie.description || "",
+      duration_minutes: movie.duration_minutes || 120,
+      price: movie.price || 10.0,
+      genre_name: movie.genre_name || "Action",
+      thumbnail_url: movie.thumbnail_url || ""
     });
   };
 
@@ -160,11 +172,11 @@ export default function Movies() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {movies.filter(m => (m.title as string).toLowerCase().includes(searchQuery.toLowerCase()) || (m.genre_name && (m.genre_name as string).toLowerCase().includes(searchQuery.toLowerCase()))).map((movie) => (
+            {movies.filter(m => m.title.toLowerCase().includes(searchQuery.toLowerCase()) || (m.genre_name && m.genre_name.toLowerCase().includes(searchQuery.toLowerCase()))).map((movie) => (
               <div key={movie.id} className="glass-panel rounded-xl overflow-hidden group hover:scale-[1.02] transition-transform duration-300 border border-zinc-800 flex flex-col">
                 <div className="h-64 bg-zinc-800 relative">
                   {movie.thumbnail_url ? (
-                    <Image src={movie.thumbnail_url as string} alt={movie.title as string} fill className="object-cover" unoptimized />
+                    <Image src={movie.thumbnail_url} alt={movie.title} fill className="object-cover" unoptimized />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-zinc-600 font-semibold">No Image</div>
                   )}
@@ -172,7 +184,7 @@ export default function Movies() {
                     <Star size={12} className="text-yellow-400" /> {movie.rating || 'N/A'}
                   </div>
                   <div className="absolute bottom-2 left-2 bg-emerald-600/90 text-white backdrop-blur text-xs font-bold px-2.5 py-1 rounded flex items-center gap-0.5 shadow">
-                    <DollarSign size={12} /> {movie.price ? (movie.price as number).toFixed(2) : "10.00"}
+                    <DollarSign size={12} /> {movie.price ? movie.price.toFixed(2) : "10.00"}
                   </div>
                   
                   
