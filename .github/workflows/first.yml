@@ -65,7 +65,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: hmzsrx/movie-reservation-backend:latest
+          tags: hshamza/movie-reservation-backend:latest
 
   frontend:
     runs-on: ubuntu-latest
@@ -107,4 +107,4 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: hmzsrx/movie-reservation-frontend:latest
+          tags: hshamza/movie-reservation-frontend:latest
