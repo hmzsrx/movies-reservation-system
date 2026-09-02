@@ -163,20 +163,21 @@ export default function AdminDashboard() {
     }
   };
 
+  // After
   const openEditModal = (movie: Record<string, unknown>) => {
     setEditingMovie(movie);
     setEditFile(null);
     setEditForm({
-      title: movie.title || "",
-      description: movie.description || "",
-      duration_minutes: movie.duration_minutes || 120,
-      price: movie.price || 15.00,
-      genre_name: movie.genre_name || "Action",
-      release_date: movie.release_date ? movie.release_date.split("T")[0] : "",
-      thumbnail_url: movie.thumbnail_url || ""
+      title: (movie.title as string) || "",
+      description: (movie.description as string) || "",
+      duration_minutes: (movie.duration_minutes as number) || 120,
+      price: (movie.price as number) || 15.00,
+      genre_name: (movie.genre_name as string) || "Action",
+      release_date: movie.release_date ? (movie.release_date as string).split("T")[0] : "",
+      thumbnail_url: (movie.thumbnail_url as string) || ""
     });
   };
-
+  
   const handleUpdateMovie = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingMovie) return;
